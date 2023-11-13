@@ -1,5 +1,6 @@
 notebook
 torchvision
-torch-geometric
-scikit-image
 matplotlib
+plotly
+scikit-learn
+scikit-image
