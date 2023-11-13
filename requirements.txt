@@ -1,0 +1,4 @@
+notebook
+torchvision
+torch-geometric
+scikit-image
