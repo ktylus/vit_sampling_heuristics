@@ -1,0 +1,6 @@
+notebook
+torchvision
+matplotlib
+plotly
+scikit-learn
+scikit-image
