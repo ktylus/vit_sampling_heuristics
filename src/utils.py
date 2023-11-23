@@ -19,14 +19,14 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def check_labels(dataset: torchvision.datasets) -> None:
     """
-    Checks whether all of the possible classes are represented in a given subset.
+    Checks whether all the possible classes are represented in a given subset.
     """
     check = Counter([str(label) for _, label in dataset])
     all_labels = all([False if str(i) not in check.keys() else True for i in range(0, 102)])
     if all_labels:
-      print("There's at least 1 instance of each class")
+        print("There's at least 1 instance of each class")
     else:
-      print("At least one class is not represented in this set")
+        print("At least one class is not represented in this set")
 
 
 def save_model(model, dir: str, model_name: str) -> None:
@@ -39,7 +39,7 @@ def save_model(model, dir: str, model_name: str) -> None:
     exists = os.path.exists(path)
 
     if not exists:
-      # Create a new directory because it does not exist 
+        # Create a new directory because it does not exist
         os.makedirs(path)
 
     # Save the model in a given directory
@@ -60,7 +60,7 @@ def plot_img(img, preprocess, title=None) -> None:
     plt.show()
 
 
-def load_and_transform(f: float = 0.8, weights = ViT_B_16_Weights.IMAGENET1K_V1) -> Dict:
+def load_and_transform(f: float = 0.8, weights=ViT_B_16_Weights.IMAGENET1K_V1) -> Dict:
     """Load, transform and split Flowers102 dataset into train, valid and test datasets.
     :param f: f fraction of the training dataset not allocated for a validation dataset;
     :param weights: pretrained model weights;
@@ -92,7 +92,7 @@ def load_and_transform(f: float = 0.8, weights = ViT_B_16_Weights.IMAGENET1K_V1)
     return {"train": train_dataset, "valid": valid_dataset, "test": test_dataset}
 
 
-def unfreeze_params(model, unfreeze_params: bool=False, all: bool=False) -> None:
+def unfreeze_params(model, unfreeze_params: bool = False, all: bool = False) -> None:
     """Freezes and unfreezes model parameters, useful during model training.
     :param unfreeze_params: if True, model parameters should be unfreezed
     :param all: if all parameters should be affected"""
@@ -148,24 +148,24 @@ def run_epoch(model, optimizer, criterion, loader, optimizer2=None) -> None:
         x, y = x.to(device), y.to(device)
         N += y.shape[0]
 
-        #don't accumulate gradients
+        # don't accumulate gradients
         optimizer.zero_grad()
         if optimizer2:
             optimizer2.zero_grad()
         output: torch.Tensor = model(x)
 
         loss: torch.Tensor = criterion(output, target=y)
-        #backwards pass through the network
+        # backwards pass through the network
         loss.backward()
 
-        #apply gradients
+        # apply gradients
         optimizer.step()
         if optimizer2:
             optimizer2.step()
 
 
 def train_with_params(params: dict, criterion,  datasets: dict, ViT_path: str, 
-                    unfreezed: bool = False, at_beginning: bool=False, lr2: float = 1e-4) -> Tuple:
+                    unfreezed: bool = False, at_beginning: bool = False, lr2: float = 1e-4) -> Tuple:
     """
     :param params: a dictionary containing parameters 'batch_size', 'lr', etc.;
     :param criterion: criterion to be used during training epochs;
@@ -195,9 +195,9 @@ def train_with_params(params: dict, criterion,  datasets: dict, ViT_path: str,
     for epoch in range(params["epochs_num"]):
         if at_beginning and epoch == 0 and unfreezed:
             print("Training with unfreezed params, first epoch")
-            unfreeze_params(test_model, unfreeze_params=True, all=True) # unfreeze all params
+            unfreeze_params(test_model, unfreeze_params=True, all=True)  # unfreeze all params
             run_epoch(test_model, optimizer, criterion, train_loader, optimizer2=optimizer2)
-            unfreeze_params(test_model, unfreeze_params=False) # freeze params back
+            unfreeze_params(test_model, unfreeze_params=False)  # freeze params back
 
         elif not at_beginning and epoch == params["epochs_num"]-1 and unfreezed:
             print("Training with unfreezed params, last epoch")
@@ -239,7 +239,7 @@ def find_best_params(param_grid, max_num_sets, criterion, datasets, ViT_path: st
     param_grid = make_params_grid(param_grid, max_num_sets, randomize=True)
 
     for i, params in enumerate(param_grid):
-        model_valid_acc, trained_model = train_with_params(params=params, criterion=criterion, datasets=datasets, \
+        model_valid_acc, trained_model = train_with_params(params=params, criterion=criterion, datasets=datasets,
                                                           unfreezed=unfreezed, at_beginning=at_beginning, ViT_path=ViT_path)
         if max_num_sets > 1:
             print(f'Model: {i} trained, valid accuracy: {model_valid_acc:.4f}')
@@ -257,6 +257,6 @@ def find_best_params(param_grid, max_num_sets, criterion, datasets, ViT_path: st
 
     test_loader = DataLoader(datasets["test"], batch_size=best_params['batch_size'], shuffle=False)
     best_model = torch.load(ViT_best_path)
-    print(f'Test accuracy: {valid(best_model, test_loader):.4f}' )
+    print(f'Test accuracy: {valid(best_model, test_loader):.4f}')
 
     return best_params
