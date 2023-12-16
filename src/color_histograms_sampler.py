@@ -98,15 +98,3 @@ def sample_patches(image, k):
     top_entropy_patches_indices = find_top_k_entropy_patches(grid_patches, k)
     patches, coords = divide_patches_in_four(grid_patches, grid_coords, top_entropy_patches_indices)
     return patches, coords
-
-
-transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor()
-])
-
-flowers = datasets.Flowers102("../data/flowers", transform=transform)
-img = flowers[0][0]
-
-print(sample_patches(img, 10)[0].shape)
-print(sample_patches(img, 10)[1].shape)

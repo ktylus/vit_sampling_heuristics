@@ -29,13 +29,3 @@ def generate_patches(image, indices):
     patches = torch.stack(patches_list, dim=0)
     return patches, coords
 
-
-transform = transforms.Compose([
-    transforms.Resize((img_size, img_size)),
-    transforms.ToTensor()
-])
-
-flowers = datasets.Flowers102("../data/flowers", transform=transform)
-img = flowers[0][0]
-print(edge_detector_point_sampling(img, 5, 2))
-
