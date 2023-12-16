@@ -1,4 +1,4 @@
-# Sampling Heuristics for Vision Transformers
+# Adaptive Sampling Heuristics for Vision Transformers
 
 Files description:
 
@@ -19,6 +19,8 @@ All the required packages for this project can be installed via the command:
 
 # Sources:
 [1] [Beyond Grids: Exploring Elastic Input Sampling for Vision Transformers](https://arxiv.org/abs/2309.13353)<br/>
-[2] [Beyond Grids repository](https://github.com/apardyl/beyondgrids-next)<br/>
-[3] [Oxford Flowers102 Dataset](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)<br/>
-[4] [Stanford Cars Dataset](https://pytorch.org/vision/main/generated/torchvision.datasets.StanfordCars.html)<br/>
+[2] [Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization](https://arxiv.org/abs/1610.02391)<br/>
+[3] [Beyond Grids repository](https://github.com/apardyl/beyondgrids-next), Apache 2.0 license<br/>
+[4] [Grad-CAM repository](https://github.com/jacobgil/pytorch-grad-cam), MIT license<br/>
+[5] [Oxford Flowers102 Dataset](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)<br/>
+[6] [Stanford Cars Dataset](https://pytorch.org/vision/main/generated/torchvision.datasets.StanfordCars.html)<br/>
