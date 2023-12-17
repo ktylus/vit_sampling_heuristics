@@ -3,11 +3,11 @@ from torchvision import datasets, transforms
 
 from elastic_vit_example.patch_sampler import GridSamplerV2, PatchSampler
 from elastic_vit_example.custom_dataset import CustomDataset
-from utils import batch_histogram
+from src.utils import batch_histogram
 
 
-def sample_patches(image, n_patches_in_stages: list):
-    grid_sampler = GridSamplerV2()
+def sample_patches(image, n_patches_in_stages: list, patch_size: tuple):
+    grid_sampler = GridSamplerV2(patches_num_yx=(image.shape[-2] // patch_size[0], image.shape[-1] // patch_size[1]))
     patches, coords = grid_sampler(image)
     for k in n_patches_in_stages:
         top_entropy_patches_indices = find_top_k_entropy_patches(patches, k)
@@ -107,4 +107,4 @@ class ColorHistogramsEntropySampler(PatchSampler):
         self.n_patches_in_stages = n_patches_in_stages
 
     def __call__(self, img):
-        return sample_patches(img, self.n_patches_in_stages)
+        return sample_patches(img, self.n_patches_in_stages, self.patch_size)
