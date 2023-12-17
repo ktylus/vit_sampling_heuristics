@@ -1,9 +1,18 @@
 import torch
 from torchvision import datasets, transforms
 
-from elastic_vit_example.patch_sampler import GridSamplerV2
+from elastic_vit_example.patch_sampler import GridSamplerV2, PatchSampler
 from elastic_vit_example.custom_dataset import CustomDataset
 from utils import batch_histogram
+
+
+def sample_patches(image, n_patches_in_stages: list):
+    grid_sampler = GridSamplerV2()
+    patches, coords = grid_sampler(image)
+    for k in n_patches_in_stages:
+        top_entropy_patches_indices = find_top_k_entropy_patches(patches, k)
+        patches, coords = divide_patches_in_four(patches, coords, top_entropy_patches_indices)
+    return patches, coords
 
 
 def find_top_k_entropy_patches(patches, k):
@@ -92,9 +101,10 @@ def divide_patches_in_four(patches, coords, patch_indices):
     return all_patches, all_coords
 
 
-def sample_patches(image, k):
-    grid_sampler = GridSamplerV2()
-    grid_patches, grid_coords = grid_sampler(image)
-    top_entropy_patches_indices = find_top_k_entropy_patches(grid_patches, k)
-    patches, coords = divide_patches_in_four(grid_patches, grid_coords, top_entropy_patches_indices)
-    return patches, coords
+class ColorHistogramsEntropySampler(PatchSampler):
+    def __init__(self, n_patches_in_stages=[10, 7], *args,  **kwargs):
+        super().__init__(*args, **kwargs)
+        self.n_patches_in_stages = n_patches_in_stages
+
+    def __call__(self, img):
+        return sample_patches(img, self.n_patches_in_stages)
