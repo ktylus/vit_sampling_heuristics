@@ -5,11 +5,12 @@ from torch.utils.data import DataLoader
 import numpy as np
 from torch.utils.data import random_split
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 from sklearn.model_selection import ParameterGrid
 from collections.abc import Iterable
 from sklearn.utils import shuffle
 from collections import Counter
-from typing import Tuple, Dict
+from typing import List, Tuple, Dict
 from torchvision.datasets import Flowers102
 from torchvision.transforms import ToTensor, Compose, Lambda
 from torchvision.models import ViT_B_16_Weights
@@ -280,3 +281,27 @@ def batch_histogram(data_tensor, num_classes=-1):
     ones = torch.tensor(1, dtype=hist.dtype, device=hist.device).expand(data_tensor.shape)
     hist.scatter_add_(-1, ((data_tensor * nc) // (maxd+1)).long(), ones)
     return hist
+
+
+def draw_patches(Image: np.array, XY: List[Tuple[np.array, np.array]], color: str='lightgreen', linewidth: int = 1):
+    """
+    Plots patches over an Image, given the corner coordinates XY
+    Args:
+        - Image: a numpy array representing the image (e.g. of a flower)
+        - XY: a list of tuples - with left upper corner and right lower corner coords per patch,
+          e.g. XY = [(np.array([0, 0]), np.array([16, 16])), (np.array([16, 16]), np.array([64,64]))] <-- two patches
+        - color: a string, color of the patches' circumference
+        - linewidth: int, width of the lines creating each patch
+    """
+    fig, ax = plt.subplots(1, 1, figsize=(5,5))
+    ax.imshow(Image)
+    ax.set_title('Image patches')
+
+    for coords in XY:
+        left_corner, right_corner = coords[0], coords[1]
+        radius = right_corner - left_corner  # get the rectangle's size
+        rectangle = patches.Rectangle(left_corner, width=radius[0], height=radius[1], fill=False, color=color, linewidth=linewidth)
+        ax.add_patch(rectangle)
+
+    plt.axis('off')
+    plt.show()
