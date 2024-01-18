@@ -22,7 +22,8 @@ def find_top_k_entropy_patches(patches, k):
 
 
 def calculate_patches_entropy(patches):
-    histograms = batch_histogram(patches.flatten(-2) * 255, 16)
+    normalized_patches = (patches - patches.min()) / (patches.max() - patches.min())
+    histograms = batch_histogram(normalized_patches.flatten(-2) * 255, 16)
     histograms = torch.where(histograms == 0, 1, histograms)
     histograms = torch.nn.functional.normalize(histograms, p=1, dim=-1)
     patches_entropy = -torch.sum((histograms * torch.log2(histograms)), dim=-1)

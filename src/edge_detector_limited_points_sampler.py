@@ -33,6 +33,7 @@ class EdgeDetectorLimitedPointsSampler(PatchSampler):
         super().__init__(*args, **kwargs)
         self.n_patches = n_patches
         self.canny_detector_sigma = canny_detector_sigma
+        self.patch_size = self.patch_size[0]
 
     def __call__(self, img):
         return edge_detector_point_sampling(img, self.n_patches, self.patch_size, self.canny_detector_sigma)
