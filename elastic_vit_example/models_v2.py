@@ -11,7 +11,7 @@ from timm.models.registry import register_model
 from timm.models.vision_transformer import Mlp, _cfg
 from math import sqrt
 
-from pos_utils import get_2dplus_sincos_pos_embed_coords, get_2d_sincos_pos_embed_coords
+from elastic_vit_example.pos_utils import get_2dplus_sincos_pos_embed_coords, get_2d_sincos_pos_embed_coords
 
 
 class Attention(nn.Module):
