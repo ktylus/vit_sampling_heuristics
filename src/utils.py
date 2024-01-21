@@ -14,7 +14,7 @@ from typing import List, Tuple, Dict
 from torchvision.datasets import Flowers102
 from torchvision.transforms import ToTensor, Compose, Lambda
 from torchvision.models import ViT_B_16_Weights
-from CAM_sampler import CAM_Sampler
+from cam_sampler import CAM_Sampler
 from elastic_vit_example import models_v2
 from elastic_vit_example.custom_dataset import CustomDataset
 import tqdm
