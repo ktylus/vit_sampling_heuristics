@@ -4,18 +4,12 @@ Files description:
 
 Folder **src** contains all source and utility python modules.
 
-The script **train.py** is used for ViT model trainig with or without frozen params.
-How to run it in the console, e.g.: `python train.py -lr 0.001 -e_n 50 -b_s 32`.
+train.py contains the code used to run tests.\
+All the patch sampling methods are implemented in their respective files.\
+Most of them are showcased in the notebooks directory.\
+Each dataset has its' class with specified data augmentations in the src/datasets directory.\
+We use some of the ElasticViT code, which is in the elastic_vit_example directory.
 
-Default values are specified, hence running a command: `python train.py` is also valid. 
-
-For more details and help run: `python train.py -h`.
-
-For this project we recommend using Python 3.10 version. An appropriate environment can be installed accordingly:
-`conda create --name <venv_name> python=3.10`
-
-All the required packages for this project can be installed via the command:
-`pip install -r requirements.txt` or using pip3 `pip3 install -r requirements.txt`
 
 # Sources:
 [1] [Beyond Grids: Exploring Elastic Input Sampling for Vision Transformers](https://arxiv.org/abs/2309.13353)<br/>
