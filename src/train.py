@@ -17,19 +17,26 @@ from datasets.flowers_dataset import FlowersDataset
 from datasets.cars_dataset import CarsDataset
 
 
-sampler = GridSamplerV2(patches_num_yx=(14, 14))
+def load_flowers_data():
+    base_train_dataset = Flowers102('../data/flowers', split='train', download=True)
+    base_val_dataset = Flowers102('../data/flowers', split='val', download=True)
+    train_dataset = FlowersDataset(base_train_dataset, 'train', sampler)
+    valid_dataset = FlowersDataset(base_val_dataset, 'val', sampler)
+    return train_dataset, valid_dataset
+
+def load_cars_data():
+    base_train_dataset = StanfordCars("../data/cars", split="train")
+    base_val_dataset = StanfordCars("../data/cars", split="test")
+    train_dataset = CarsDataset(base_train_dataset, "train", sampler)
+    valid_dataset = CarsDataset(base_val_dataset, "test", sampler)
+    return train_dataset, valid_dataset
+
+
+#sampler = GridSamplerV2(patches_num_yx=(14, 14))
 #sampler = ColorHistogramsEntropySampler(patch_size=(32, 32), n_patches_in_stages=[20, 10])
-#sampler = EdgeDetectorLimitedPointsSampler()
+sampler = EdgeDetectorLimitedPointsSampler()
 
-#base_train_dataset = Flowers102('../data/flowers', split='train', download=True)
-#base_val_dataset = Flowers102('../data/flowers', split='val', download=True)
-base_train_dataset = StanfordCars("../data/cars", split="train")
-base_val_dataset = StanfordCars("../data/cars", split="test")
-#train_dataset = FlowersDataset(base_train_dataset, 'train', sampler)
-#valid_dataset = FlowersDataset(base_val_dataset, 'val', sampler)
-train_dataset = CarsDataset(base_train_dataset, "train", sampler)
-valid_dataset = CarsDataset(base_val_dataset, "test", sampler)
-
+train_dataset, valid_dataset = load_flowers_data()
 batch_size = 16
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False)
@@ -87,15 +94,8 @@ def get_optimizers(model: nn.Module, lr_head: float = 1e-3, lr_embed: float = 1e
     return optimizer_head, optimizer_embed, optimizer_attn
 
 
-def train(model: nn.Module, epochs: int, train_head: bool = True, train_embed: bool = False, train_attn: bool = False):
+def train(model: nn.Module, epochs: int, optimizer):
     criterion = torch.nn.CrossEntropyLoss()
-    optimizers = []
-    if train_head:
-        optimizers.append(optimizer_head)
-    if train_embed:
-        optimizers.append(optimizer_embed)
-    if train_attn:
-        optimizers.append(optimizer_attn)
     for epoch in range(epochs):
         running_loss = 0.0
         model.train()
@@ -105,13 +105,11 @@ def train(model: nn.Module, epochs: int, train_head: bool = True, train_embed: b
             x, coords, labels, images = data
             x, coords, labels, images = x.to(device), coords.to(device), labels.to(device), images.to(device)
 
-            for optimizer in optimizers:
-                optimizer.zero_grad()
+            optimizer.zero_grad()
             outputs = model(x, coords)
             loss = criterion(outputs, labels)
             loss.backward()
-            for optimizer in optimizers:
-                optimizer.step()
+            optimizer.step()
             train_correct += (torch.argmax(outputs, dim=-1) == labels).sum().item()
             train_outputs += outputs.shape[0]
 
@@ -135,52 +133,15 @@ optimizer_head, optimizer_embed, optimizer_attn = get_optimizers(model)
 epochs = 5
 
 t1 = time.time()
+
 grads_head(model, freeze=False)
-train(model, epochs, train_head=True)
+train(model, epochs, optimizer_head)
+
 grads_embed(model, freeze=False)
-train(model, epochs, train_head=False, train_embed=True)
+train(model, epochs, optimizer_embed)
+
 unfreeze_attn(model)
-train(model, epochs, train_head=False, train_embed=False, train_attn=True)
+train(model, epochs, optimizer_attn)
+
 t2 = time.time()
 print(t2 - t1)
-
-
-"""
-FLOWERS:
-
-grid sampler (10 epoch x 3):
-liczba patchów: 196
-3 etap najlepszy wynik valid: 0.882
-czas: 43min
-
-edge detector (10 epoch x 3):
-liczba patchów - 100
-3 etap najlepszy wynik valid: 0.839
-czas: 34min
-
-color histograms entropy (10 epoch x 3):
-etapy: (20, 10)
-liczba patchów - 139
-3 etap najlepszy wynik valid: 0.840
-czas: 34min
-
-
-
-STANFORD CARS:
-
-grid sampler (5 epoch x 3):
-liczba patchów - 196
-1 etap najlepszy wynik valid: 0.722
-czas: 3h 43min
-
-edge detector (5 epoch x 3):
-liczba patchów - 100
-1 etap najlepszy wynik valid:
-czas:
-
-color histograms entropy (5 epoch x 1):
-etapy: (20, 10)
-liczba patchów - 139
-1 etap najlepszy wynik valid:
-czas:
-"""

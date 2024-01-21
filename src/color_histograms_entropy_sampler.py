@@ -1,8 +1,7 @@
 import torch
-from torchvision import datasets, transforms
+from torchvision import transforms
 
 from elastic_vit_example.patch_sampler import GridSamplerV2, PatchSampler
-from elastic_vit_example.custom_dataset import CustomDataset
 from src.utils import batch_histogram
 
 

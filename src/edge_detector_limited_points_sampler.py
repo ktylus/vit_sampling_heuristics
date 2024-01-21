@@ -1,5 +1,5 @@
 import torch
-from torchvision import datasets, transforms
+from torchvision import transforms
 from torchvision.transforms.functional import resized_crop
 from skimage import feature
 
